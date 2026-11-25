@@ -79,7 +79,7 @@ def user_input_mode():
 
     score_a = mac(pattern, filter_a)
     score_b = mac(pattern, filter_b)
-
+    
     result = classify(score_a, score_b)
 
 
@@ -91,7 +91,149 @@ def user_input_mode():
     print(f"판정: {result}")
 
 
+def load_json_data():
+    file_path = Path(__file__).resolve().parent / "data.json"
 
+    with open(file_path, "r", encoding="utf-8") as file:
+        data = json.load(file)
+
+    return data
+def normalize_label(label):
+    label = str(label).strip().lower()
+
+    if label in ("cross", "+", "a"):
+        return "+"
+    elif label in ("x", "b"):
+        return "x"
+    elif label == "undecided":
+        return "UNDECIDED"
+    else:
+        return "UNKNOWN"
+def get_filters(data, pattern):
+    size = len(pattern)
+    filter_key = f"size_{size}"
+
+    if filter_key not in data["filters"]:
+        raise ValueError(f"지원하지 않는 패턴 크기: {size}")
+
+    filters = data["filters"][filter_key]
+
+    return filters["cross"], filters["x"]
+def validate_matrix(matrix, size):
+    if not isinstance(matrix, list):
+        return False
+
+    if len(matrix) != size:
+        return False
+
+    for row in matrix:
+        if not isinstance(row, list):
+            return False
+
+        if len(row) != size:
+            return False
+
+        for value in row:
+            if type(value) not in (int, float):
+                return False
+
+            if not math.isfinite(value):
+                return False
+
+    return True
+def validate_pattern_key(key, pattern):
+    parts = key.split("_")
+
+    if len(parts) != 3:
+        return False
+
+    if parts[0] != "size":
+        return False
+
+    if parts[1] not in ("5", "13", "25"):
+        return False
+
+    if not parts[2].isdigit():
+        return False
+
+    size = int(parts[1])
+
+    return validate_matrix(pattern, size) 
+def json_analysis_mode():
+    data = load_json_data()
+    total_count = 0
+    pass_count = 0
+    fail_count = 0
+    error_count = 0
+    timing_results = {}
+
+    print("\n[JSON 데이터 자동 분석]")
+
+    for key, item in data["patterns"].items():
+        total_count += 1
+        try:
+            pattern = item["input"]
+            expected = normalize_label(item["expected"])
+            if expected == "UNKNOWN":
+                raise ValueError("지원하지 않는 정답 라벨")
+            size = len(pattern)
+            if not validate_pattern_key(key, pattern):
+                raise ValueError("키 이름 또는 배열 크기 오류")
+
+            filter_a, filter_b = get_filters(data, pattern)
+
+            if not all(validate_matrix(m, size)
+                       for m in (pattern, filter_a, filter_b)):
+                raise ValueError("잘못된 배열 데이터")
+
+            score_a = mac(pattern, filter_a)
+            score_b = mac(pattern, filter_b)
+            time_a = measure_mac(pattern, filter_a, 1000)
+            time_b = measure_mac(pattern, filter_b, 1000)
+            if size not in timing_results:
+                timing_results[size] = []
+                timing_results[size].append(time_a)
+                timing_results[size].append(time_b)
+
+            result = normalize_label(classify(score_a, score_b))
+
+            status = "PASS" if result == expected else "FAIL"
+
+            if status == "PASS":
+                pass_count += 1
+            else:
+                fail_count += 1
+
+            print(f"\n패턴: {key}")
+            print(f"크기: {size}×{size}")
+            print(f"십자가 점수: {score_a}")
+            print(f"X 점수: {score_b}")
+            print(f"십자가 연산 시간: {time_a:.6f} ms")
+            print(f"X 연산 시간: {time_b:.6f} ms")
+            print(f"판정: {result}")
+            print(f"정답: {expected}")
+            print(f"검사 결과: {status}")
+
+        except (ValueError, KeyError, TypeError) as error:
+            error_count += 1
+            print(f"{key}: 데이터 오류 - {error}") 
+    print("\n[크기별 평균 MAC 연산 시간]")
+
+    for size in sorted(timing_results):
+        times = timing_results[size]
+        average_time = sum(times) / len(times)
+        print(f"{size}x{size}: {average_time: 6f} ms")
+    accuracy = (pass_count / total_count * 100) if total_count > 0 else 0
+
+    print("\n" + "=" * 45)
+    print("🐼 Pink Panda Mini NPU 최종 분석 결과")
+    print("=" * 45)
+    print(f"전체 검사: {total_count}개")
+    print(f"성공: {pass_count}개")
+    print(f"실패: {fail_count}개")
+    print(f"데이터 오류: {error_count}개")
+    print(f"판정 정확도: {accuracy:.2f}%")
+    print("=" * 45)
 def main():
     print("=" * 45)
     print("🐼 Pink Panda Mini NPU Simulator")
@@ -109,7 +251,7 @@ def main():
     if choice == "1":
         user_input_mode()
     elif choice == "2":
-        print("JSON 데이터 분석 모드입니다.")
+        json_analysis_mode()
     elif choice == "3":
         print("프로그램을 종료합니다.")
     else:
