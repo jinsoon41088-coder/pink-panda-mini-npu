@@ -46,7 +46,7 @@ def input_matrix(name, n=3):
 
     return matrix
 
-def measure_mac(pattern, filter_matrix, repeat=10):
+def measure_mac(pattern, filter_matrix, repeat=1000):
     total_time = 0.0
 
     for _ in range(repeat):
@@ -57,7 +57,6 @@ def measure_mac(pattern, filter_matrix, repeat=10):
         total_time += (end - start) * 1000
 
     return total_time / repeat
-
 
 def user_input_mode():
 
@@ -79,7 +78,7 @@ def user_input_mode():
 
     score_a = mac(pattern, filter_a)
     score_b = mac(pattern, filter_b)
-    
+
     result = classify(score_a, score_b)
 
 
@@ -87,30 +86,45 @@ def user_input_mode():
     print(f"B 점수: {score_b}")
     print(f"A 연산 시간: {time_a:.6f} ms")
     print(f"B 연산 시간: {time_b:.6f} ms")
+    average_time = (time_a + time_b) / 2
+    print(f"3x3 평균 MAC 연산 시간: {average_time:.6f} ms")
+    print("MAC 연산 횟수: 9회")
 
     print(f"판정: {result}")
 
 
-def load_json_data():
-    file_path = Path(__file__).resolve().parent / "data.json"
+def load_json_data(filename="data.json"):
+    file_path = Path(__file__).resolve().parent / filename
 
-    with open(file_path, "r", encoding="utf-8") as file:
-        data = json.load(file)
+    try:
+        with open(file_path, "r", encoding="utf-8-sig") as file:
+            return json.load(file)
 
-    return data
+    except FileNotFoundError:
+        print(f"File not found: {filename}")
+    except json.JSONDecodeError:
+        print(f"Invalid JSON format: {filename}")
+    except UnicodeError:
+        print(f"Invalid file encoding: {filename}")
+    except OSError as error:
+        print(f"File read error: {error}")
+
+    return None
+
+
 def normalize_label(label):
     label = str(label).strip().lower()
 
     if label in ("cross", "+", "a"):
-        return "+"
+        return "Cross"
     elif label in ("x", "b"):
-        return "x"
+        return "X"
     elif label == "undecided":
         return "UNDECIDED"
     else:
         return "UNKNOWN"
-def get_filters(data, pattern):
-    size = len(pattern)
+def get_filters(data, key):
+    size = int(key.split(chr(95))[1])
     filter_key = f"size_{size}"
 
     if filter_key not in data["filters"]:
@@ -158,12 +172,27 @@ def validate_pattern_key(key, pattern):
 
     size = int(parts[1])
 
-    return validate_matrix(pattern, size) 
-def json_analysis_mode():
-    data = load_json_data()
+    return validate_matrix(pattern, size)
+def json_analysis_mode(filename="data.json"):
+    data = load_json_data(filename)
+    if data is None:
+        print("JSON analysis cancelled.")
+        return
+
+    if not isinstance(data, dict):
+        print("Invalid JSON structure: root must be an object.")
+        print("JSON analysis cancelled.")
+        return
+
+    if not isinstance(data.get("patterns"), dict):
+        print("Invalid JSON structure: patterns must be an object.")
+        print("JSON analysis cancelled.")
+        return
+
     total_count = 0
     pass_count = 0
     fail_count = 0
+    failed_cases = []
     error_count = 0
     timing_results = {}
 
@@ -180,7 +209,7 @@ def json_analysis_mode():
             if not validate_pattern_key(key, pattern):
                 raise ValueError("키 이름 또는 배열 크기 오류")
 
-            filter_a, filter_b = get_filters(data, pattern)
+            filter_a, filter_b = get_filters(data, key)
 
             if not all(validate_matrix(m, size)
                        for m in (pattern, filter_a, filter_b)):
@@ -192,8 +221,9 @@ def json_analysis_mode():
             time_b = measure_mac(pattern, filter_b, 1000)
             if size not in timing_results:
                 timing_results[size] = []
-                timing_results[size].append(time_a)
-                timing_results[size].append(time_b)
+
+            timing_results[size].append(time_a)
+            timing_results[size].append(time_b)
 
             result = normalize_label(classify(score_a, score_b))
 
@@ -203,6 +233,7 @@ def json_analysis_mode():
                 pass_count += 1
             else:
                 fail_count += 1
+                failed_cases.append((key, result, expected))
 
             print(f"\n패턴: {key}")
             print(f"크기: {size}×{size}")
@@ -216,15 +247,20 @@ def json_analysis_mode():
 
         except (ValueError, KeyError, TypeError) as error:
             error_count += 1
-            print(f"{key}: 데이터 오류 - {error}") 
+            fail_count += 1
+            failed_cases.append((key, str(error), None))
+            print(f"{key}: 데이터 오류 - {error}")
+    pattern_3 = [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
+    filter_3 = [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
+    timing_results[3] = [measure_mac(pattern_3, filter_3)]
     print("\n[크기별 평균 MAC 연산 시간]")
 
     for size in sorted(timing_results):
         times = timing_results[size]
         average_time = sum(times) / len(times)
-        print(f"{size}x{size}: {average_time: 6f} ms")
-    accuracy = (pass_count / total_count * 100) if total_count > 0 else 0
+        print(f"{size}x{size}: {average_time:.6f} ms | MAC 연산 횟수: {size ** 2}회")
 
+    accuracy = (pass_count / total_count * 100) if total_count > 0 else 0
     print("\n" + "=" * 45)
     print("🐼 Pink Panda Mini NPU 최종 분석 결과")
     print("=" * 45)
@@ -233,29 +269,44 @@ def json_analysis_mode():
     print(f"실패: {fail_count}개")
     print(f"데이터 오류: {error_count}개")
     print(f"판정 정확도: {accuracy:.2f}%")
+
+    print("\n[Failure Report]")
+    if not failed_cases:
+        print("No failed cases")
+    else:
+        for key, result, expected in failed_cases:
+            print(f"[FAIL] {key}")
+            if expected is None:
+                print(f"Data error: {result}")
+            else:
+                print("Reason: Label mismatch")
+                print(f"Actual: {result}")
+                print(f"Expected: {expected}")
     print("=" * 45)
 def main():
     print("=" * 45)
-    print("🐼 Pink Panda Mini NPU Simulator")
-    print("AI가 계산하는 방식을 흉내 내는 작은 계산기")
+    print("\U0001F43C Pink Panda Mini NPU Simulator")
+    print("AI \uacc4\uc0b0 \uc2dc\ubbac\ub808\uc774\ud130")
     print("=" * 45)
 
-    print("\n[모드 선택]")
-    print("1. 사용자 입력 (3×3)")
-    print("2. data.json 분석")
-    print("3. 프로그램 종료")
+    print("\n[Mode Selection]")
+    print("1. User Input (3x3)")
+    print("2. Local Dataset Analysis")
+    print("3. Official Dataset Analysis")
+    print("4. Exit")
 
-    choice = input("선택: ")
+    choice = input("Select: ").strip()
 
- 
     if choice == "1":
         user_input_mode()
     elif choice == "2":
-        json_analysis_mode()
+        json_analysis_mode("data.json")
     elif choice == "3":
-        print("프로그램을 종료합니다.")
+        json_analysis_mode("data-official.json")
+    elif choice == "4":
+        print("Program terminated.")
     else:
-        print("잘못된 입력입니다.")
+        print("Invalid menu selection.")
 
 
 if __name__ == "__main__":
