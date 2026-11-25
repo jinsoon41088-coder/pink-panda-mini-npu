@@ -262,7 +262,7 @@ def json_analysis_mode(filename="data.json"):
 
     accuracy = (pass_count / total_count * 100) if total_count > 0 else 0
     print("\n" + "=" * 45)
-    print("🐼 Pink Panda Mini NPU 최종 분석 결과")
+    print("🐼 핑크판다 미니 NPU 최종 분석 결과")
     print("=" * 45)
     print(f"전체 검사: {total_count}개")
     print(f"성공: {pass_count}개")
@@ -270,33 +270,33 @@ def json_analysis_mode(filename="data.json"):
     print(f"데이터 오류: {error_count}개")
     print(f"판정 정확도: {accuracy:.2f}%")
 
-    print("\n[Failure Report]")
+    print("\n[실패 리포트]")
     if not failed_cases:
-        print("No failed cases")
+        print("실패 사례 없음")
     else:
         for key, result, expected in failed_cases:
-            print(f"[FAIL] {key}")
+            print(f"[실패(FAIL)] {key}")
             if expected is None:
-                print(f"Data error: {result}")
+                print(f"데이터 오류: {result}")
             else:
-                print("Reason: Label mismatch")
-                print(f"Actual: {result}")
-                print(f"Expected: {expected}")
+                print("실패 원인: 정답 라벨 불일치")
+                print(f"실제 판정: {result}")
+                print(f"예상 정답: {expected}")
     print("=" * 45)
 def main():
     print("=" * 45)
-    print("\U0001F43C Pink Panda Mini NPU Simulator")
-    print("AI \uacc4\uc0b0 \uc2dc\ubbac\ub808\uc774\ud130")
+    print("🐼 핑크판다 미니 NPU 시뮬레이터")
+    print("AI 계산 시뮬레이터")
     print("=" * 45)
 
-    print("\n[Mode Selection]")
-    print("1. User Input (3x3)")
-    print("2. Local Dataset Analysis")
-    print("3. Official Dataset Analysis")
-    print("4. Exit")
+    print("\n[메뉴 선택]")
+    print("1. 사용자 직접 입력 (3x3)")
+    print("2. 로컬 데이터 분석")
+    print("3. 공식 데이터 분석")
+    print("4. 프로그램 종료")
 
-    choice = input("Select: ").strip()
-
+    choice = input("메뉴 선택: ").strip()
+    
     if choice == "1":
         user_input_mode()
     elif choice == "2":
