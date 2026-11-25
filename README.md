@@ -132,18 +132,18 @@ UNDECIDED로 판정합니다.
 | 13×13 | 169 | 0.011757 ms |
 | 25×25 | 625 | 0.031468 ms |
 
-#### MAC Benchmark Analysis
+#### ⏱️ MAC 연산 성능 측정 분석
 
-- Each MAC timing test is repeated 1,000 times.
-- Only the MAC function execution time is measured.
-- The average time is calculated in milliseconds.
-- A 3x3 matrix requires 9 MAC operations.
-- A 5x5 matrix requires 25 MAC operations.
-- A 13x13 matrix requires 169 MAC operations.
-- A 25x25 matrix requires 625 MAC operations.
-- Nested loops process N*N matrix elements.
-- Therefore, the time complexity is O(N^2).
-- Doubling N increases the operation count fourfold.
+- MAC 연산 시간 측정은 각각 1,000회 반복하여 수행합니다.
+- MAC 함수가 실행되는 시간만 측정합니다.
+- 평균 연산 시간은 밀리초(ms) 단위로 계산합니다.
+- 3×3 크기의 행렬은 9회의 MAC 연산이 필요합니다.
+- 5×5 크기의 행렬은 25회의 MAC 연산이 필요합니다.
+- 13×13 크기의 행렬은 169회의 MAC 연산이 필요합니다.
+- 25×25 크기의 행렬은 625회의 MAC 연산이 필요합니다.
+- 이중 반복문을 사용하여 N×N개의 행렬 요소를 처리합니다.
+- 따라서 MAC 연산의 시간 복잡도는 O(N²)입니다.
+- 행렬의 한 변의 크기(N)가 2배 증가하면 연산 횟수는 4배 증가합니다.
 
 
 배열의 크기가 N×N이면 모든 원소를
@@ -166,20 +166,21 @@ UNDECIDED로 판정합니다.
 - 지원하지 않는 정답 라벨
 - 실제 판정과 정답의 불일치
 
-Data errors and label mismatches are both counted as FAIL.
-Data errors are also reported separately as a subset of failures.
+데이터 오류와 정답 라벨 불일치는 모두 실패(FAIL)로 집계합니다.
+
+데이터 오류는 전체 실패 횟수에 포함되며, 데이터 오류 횟수는 별도로 구분하여 표시합니다.
 
 
-#### Failure Report Policy
+#### 📋 실패 리포트 처리 규칙
 
-- All data errors are counted as FAIL.
-- Data errors are a subset of total failures.
-- Total cases = PASS cases + FAIL cases.
-- Invalid case data does not stop the remaining tests.
-- Failed case identifiers and reasons are recorded.
-- Label mismatches show actual and expected labels.
-- Data errors show detailed error messages.
-- If all cases pass, the report shows No failed cases.
+- 모든 데이터 오류는 실패(FAIL)로 집계합니다.
+- 데이터 오류 횟수는 전체 실패 횟수에 포함됩니다.
+- 전체 검사 수 = 성공(PASS) 수 + 실패(FAIL) 수입니다.
+- 일부 데이터에 오류가 발생하더라도 나머지 데이터의 검사를 계속 진행합니다.
+- 실패한 데이터의 식별 이름과 실패 원인을 기록합니다.
+- 판정 결과가 정답과 일치하지 않으면 실제 판정 결과와 예상 정답을 함께 표시합니다.
+- 데이터 오류가 발생하면 자세한 오류 메시지를 표시합니다.
+- 모든 데이터가 검사를 통과하면 실패 사례 없음(No failed cases)을 표시합니다.
 
 ### 🎮 11. 프로그램 실행 방법
 
@@ -188,19 +189,20 @@ Data errors are also reported separately as a subset of failures.
     python main.py
 
 프로그램 실행 메뉴:
+### 🐼 핑크판다 미니 NPU 시뮬레이터
 
-    🐼 Pink Panda Mini NPU Simulator
+    1. 사용자 직접 입력 (3×3)
+    2. 로컬 데이터 분석
+    3. 공식 데이터 분석
+    4. 프로그램 종료
 
-    1. User Input (3x3)
-    2. Local Dataset Analysis
-    3. Official Dataset Analysis
-    4. Exit
+#### 📋 메뉴별 기능 설명
 
-- Mode 1: Enter 3x3 matrices and calculate MAC scores.
-- Mode 2: Analyze the local dataset (data.json).
-- Mode 3: Analyze the official dataset (data-official.json).
-- Mode 4: Exit the program.
-- Invalid menu selections display an error message.
+- **메뉴 1:** 3×3 크기의 행렬을 직접 입력하고 MAC 연산을 수행하여 점수를 계산합니다.
+- **메뉴 2:** 로컬 데이터 파일(data.json)을 불러와 패턴을 분석합니다.
+- **메뉴 3:** 공식 데이터 파일(data-official.json)을 불러와 패턴을 분석합니다.
+- **메뉴 4:** 프로그램을 종료합니다.
+- 잘못된 메뉴 번호를 입력하면 오류 메시지를 표시합니다.
 
 
 ### 📊 12. 최종 실행 결과
@@ -287,127 +289,127 @@ MAC 연산, JSON 데이터 처리, 라벨 정규화,
 
 ### 16. 결과 리포트 (Result Report)
 
-1. All six local test patterns passed successfully.
-2. The normal test accuracy was 100.00%.
-3. No failures or data errors occurred in the normal test.
-4. Label normalization converts + and x to Cross and X.
-5. EPSILON is set to 1e-9 to handle small numerical differences.
-6. The error test intentionally introduced two failed cases.
-7. The error test produced four PASS and two FAIL results.
-8. The error test accuracy was 66.67%.
-9. size_5_1 failed because the expected label was incorrect.
-10. size_5_2 failed because the matrix size was invalid.
-11. Data errors are included in the total FAIL count.
-12. The failure report records case identifiers and reasons.
-13. MAC execution time is measured over 1,000 repetitions.
-14. The MAC operation counts are 9, 25, 169, and 625.
-15. The MAC time complexity is O(N^2).
-16. Execution time increases as the matrix size increases.
-17. Official dataset verification is complete.
+### 16. 결과 리포트
 
-#### Additional Result Analysis
+1. 로컬 데이터의 테스트 패턴 6개가 모두 검사를 통과했습니다.
+2. 정상 데이터의 판정 정확도는 100.00%입니다.
+3. 정상 데이터 검사에서는 판정 실패와 데이터 오류가 발생하지 않았습니다.
+4. 라벨 정규화를 통해 +는 십자가(Cross)로, 소문자 x는 대문자 X로 변환합니다.
+5. 매우 작은 소수점 계산 오차를 처리하기 위해 EPSILON(허용오차)을 1e-9로 설정했습니다.
+6. 오류 처리 기능을 확인하기 위해 의도적으로 2개의 실패 사례를 만들었습니다.
+7. 오류 검사 결과는 성공(PASS) 4개, 실패(FAIL) 2개입니다.
+8. 오류 검사의 판정 정확도는 66.67%입니다.
+9. size_5_1은 예상 정답 라벨이 잘못되어 판정에 실패했습니다.
+10. size_5_2는 행렬의 크기가 올바르지 않아 검사에 실패했습니다.
+11. 데이터 오류도 전체 실패(FAIL) 횟수에 포함됩니다.
+12. 실패 리포트에는 실패한 데이터의 식별 이름과 실패 원인을 기록합니다.
+13. MAC 연산을 1,000회 반복하여 실행 시간을 측정했습니다.
+14. 행렬 크기별 MAC 연산 횟수는 각각 9회, 25회, 169회, 625회입니다.
+15. MAC 연산의 시간 복잡도는 O(N²)입니다.
+16. 행렬의 크기가 커질수록 연산 실행 시간이 증가합니다.
+17. 공식 데이터 검증을 완료했습니다.
 
-- All six local patterns matched their expected labels.
-- Label normalization prevents mismatches caused by different label formats.
-- EPSILON prevents false distinctions between nearly equal scores.
-- The normal test patterns did not produce near-tied scores.
-- The MAC operation count increases from 9 to 625.
-- The operation count increases approximately 69.44 times.
-- The measured execution time increases approximately 43.71 times.
-- Actual execution time depends on system conditions and measurement overhead.
-- The nested loops perform N squared MAC operations.
-- Official dataset verification is complete.
+#### 📊 추가 결과 분석
 
-### 17. Official Dataset Verification
+- 로컬 데이터의 패턴 6개가 모두 예상 정답과 일치했습니다.
+- 라벨 정규화를 통해 서로 다른 라벨 표기 방식으로 발생하는 불일치를 방지합니다.
+- EPSILON(허용오차)을 사용하여 거의 동일한 점수를 서로 다른 점수로 잘못 판단하는 것을 방지합니다.
+- 정상 데이터 검사에서는 두 점수가 거의 동일한 사례가 발생하지 않았습니다.
+- 행렬의 크기가 증가하면서 MAC 연산 횟수는 9회에서 625회로 증가했습니다.
+- MAC 연산 횟수는 약 69.44배 증가했습니다.
+- 측정된 연산 실행 시간은 약 43.71배 증가했습니다.
+- 실제 실행 시간은 컴퓨터의 성능, 시스템 상태 및 시간 측정 과정에서 발생하는 부가적인 작업에 따라 달라질 수 있습니다.
+- 이중 반복문을 사용하므로 N×N 크기의 행렬에서 N²번의 MAC 연산을 수행합니다.
+- 공식 데이터 검증을 완료했습니다.
 
-The official dataset was tested without modifying its original values.
+### 17. 공식 데이터 검증
 
-| Dataset | Total | PASS | FAIL | Data Errors | Accuracy |
+공식 데이터는 원본 데이터의 값을 수정하지 않고 그대로 사용하여 검사했습니다.
+
+| 데이터 종류 | 전체 검사 수 | 성공(PASS) | 실패(FAIL) | 데이터 오류 | 판정 정확도 |
 |---|---:|---:|---:|---:|---:|
-| Local dataset | 6 | 6 | 0 | 0 | 100.00% |
-| Official dataset | 6 | 3 | 3 | 0 | 50.00% |
+| 로컬 데이터 | 6개 | 6개 | 0개 | 0개 | 100.00% |
+| 공식 데이터 | 6개 | 3개 | 3개 | 0개 | 50.00% |
+#### 📊 공식 데이터 검사 결과
 
-#### Official Dataset Results
-
-| Pattern | Actual | Expected | Result |
+| 패턴 이름 | 실제 판정 결과 | 예상 정답 | 검사 결과 |
 |---|---|---|---|
-| size_5_1 | UNDECIDED | X | FAIL |
-| size_5_2 | Cross | Cross | PASS |
-| size_13_1 | X | X | PASS |
-| size_13_2 | UNDECIDED | Cross | FAIL |
-| size_25_1 | UNDECIDED | X | FAIL |
-| size_25_2 | Cross | Cross | PASS |
+| size_5_1 | 판정 보류(UNDECIDED) | X | 실패(FAIL) |
+| size_5_2 | 십자가(Cross) | 십자가(Cross) | 성공(PASS) |
+| size_13_1 | X | X | 성공(PASS) |
+| size_13_2 | 판정 보류(UNDECIDED) | 십자가(Cross) | 실패(FAIL) |
+| size_25_1 | 판정 보류(UNDECIDED) | X | 실패(FAIL) |
+| size_25_2 | 십자가(Cross) | 십자가(Cross) | 성공(PASS) |
 
-#### Official MAC Benchmark
+#### ⏱️ 공식 MAC 연산 성능 측정 결과
 
-| Matrix Size | MAC Operations | Average Time |
+| 행렬 크기 | MAC 연산 횟수 | 평균 연산 시간 |
 |---|---:|---:|
-| 3x3 | 9 | 0.001042 ms |
-| 5x5 | 25 | 0.002625 ms |
-| 13x13 | 169 | 0.016709 ms |
-| 25x25 | 625 | 0.043371 ms |
+| 3×3 | 9회 | 0.001042 ms |
+| 5×5 | 25회 | 0.002625 ms |
+| 13×13 | 169회 | 0.016709 ms |
+| 25×25 | 625회 | 0.043371 ms |
 
-#### Verification Evidence
+#### 📸 검증 증거 자료
 
-![Official Dataset Result](screenshots/mini-npu-official-result.png)
+![공식 데이터 검사 결과](screenshots/mini-npu-official-result.png)
 
-#### Official Dataset Failure Analysis
+#### 📊 공식 데이터 판정 실패 원인 분석
 
-| Pattern | Cross Score | X Score | Actual | Expected |
+| 패턴 이름 | 십자가 점수 | X 점수 | 실제 판정 결과 | 예상 정답 |
 |---|---:|---:|---|---|
-| size_5_1 | 0.9 | 0.8999999999999999 | UNDECIDED | X |
-| size_13_2 | 7.499999999999997 | 7.5 | UNDECIDED | Cross |
-| size_25_1 | 4.9 | 4.899999999999999 | UNDECIDED | X |
+| size_5_1 | 0.9 | 0.8999999999999999 | 판정 보류(UNDECIDED) | X |
+| size_13_2 | 7.499999999999997 | 7.5 | 판정 보류(UNDECIDED) | 십자가(Cross) |
+| size_25_1 | 4.9 | 4.899999999999999 | 판정 보류(UNDECIDED) | X |
 
-1. The official dataset contains six test patterns.
-2. Three patterns passed and three patterns failed.
-3. The official classification accuracy was 50.00%.
-4. No data validation errors occurred.
-5. All failed patterns produced nearly equal MAC scores.
-6. The score difference was smaller than EPSILON (1e-9).
-7. Floating-point arithmetic can introduce tiny numerical differences.
-8. EPSILON prevents these differences from causing arbitrary classifications.
-9. The simulator correctly returned UNDECIDED for all three near-tied cases.
-10. UNDECIDED differs from the expected labels and is counted as FAIL.
-11. The failures are related to score ambiguity rather than detected schema errors.
-12. The official dataset and expected labels were not modified.
-13. The local dataset achieved 100.00% accuracy.
-14. The official dataset achieved 50.00% accuracy.
-15. Classification accuracy and correct implementation of the comparison policy are separate evaluation criteria.
-16. All MAC measurements use 1000 repetitions.
-17. The nested MAC loops have O(N^2) time complexity.
-18. Execution time increases with the matrix size in this benchmark.
-19. Actual execution time may vary depending on system conditions.
-20. Both successful and failed results are preserved as verification evidence.
+1. 공식 데이터에는 총 6개의 테스트 패턴이 포함되어 있습니다.
+2. 검사 결과는 성공(PASS) 3개, 실패(FAIL) 3개입니다.
+3. 공식 데이터의 판정 정확도는 50.00%입니다.
+4. 데이터 유효성 검사에서 오류는 발생하지 않았습니다.
+5. 판정에 실패한 모든 패턴은 십자가와 X의 MAC 연산 점수가 거의 동일했습니다.
+6. 두 점수의 차이는 EPSILON(허용오차)인 1e-9보다 작았습니다.
+7. 컴퓨터에서 부동소수점 연산을 수행할 때 매우 작은 소수점 계산 오차가 발생할 수 있습니다.
+8. EPSILON은 이러한 작은 계산 오차 때문에 임의로 결과를 판정하는 것을 방지합니다.
+9. 시뮬레이터는 점수가 거의 동일한 3개의 사례에 대해 설정된 비교 규칙에 따라 정상적으로 판정 보류(UNDECIDED)를 반환했습니다.
+10. 판정 보류(UNDECIDED)는 예상 정답과 일치하지 않으므로 실패(FAIL)로 집계됩니다.
+11. 판정 실패의 원인은 데이터 구조의 오류가 아니라 두 점수가 거의 동일하여 명확하게 구분하기 어려웠기 때문입니다.
+12. 공식 데이터의 원본 값과 예상 정답은 수정하지 않았습니다.
+13. 로컬 데이터의 판정 정확도는 100.00%입니다.
+14. 공식 데이터의 판정 정확도는 50.00%입니다.
+15. 데이터의 판정 정확도와 점수 비교 규칙의 올바른 구현 여부는 서로 다른 평가 기준입니다.
+16. 모든 MAC 연산 시간 측정은 1,000회 반복하여 수행합니다.
+17. MAC 연산은 이중 반복문을 사용하므로 시간 복잡도는 O(N²)입니다.
+18. 이번 성능 측정에서는 행렬의 크기가 커질수록 연산 실행 시간이 증가했습니다.
+19. 실제 연산 실행 시간은 컴퓨터의 성능과 시스템 상태에 따라 달라질 수 있습니다.
+20. 성공한 검사 결과와 실패한 검사 결과를 모두 검증 증거 자료로 보존했습니다.
 
 ---
 
-### 18. Error Handling Verification
+### 18. 오류 처리 기능 검증
 
-| Test Case | Result |
+| 검사 항목 | 검사 결과 |
 |---|---|
-| Missing JSON file | PASS |
-| Invalid JSON format | PASS |
-| Missing patterns object | PASS |
-| Invalid menu selection | PASS |
-| Label mismatch detection | PASS |
-| Invalid matrix size detection | PASS |
-| Local dataset regression test | PASS |
-| Official dataset regression test | PASS |
+| JSON 파일이 존재하지 않는 경우 | 성공(PASS) |
+| JSON 파일의 형식이 잘못된 경우 | 성공(PASS) |
+| patterns 객체가 누락된 경우 | 성공(PASS) |
+| 잘못된 메뉴 번호를 입력한 경우 | 성공(PASS) |
+| 판정 결과와 정답 라벨이 일치하지 않는 경우 감지 | 성공(PASS) |
+| 잘못된 행렬 크기 감지 | 성공(PASS) |
+| 로컬 데이터 재검사 | 성공(PASS) |
+| 공식 데이터 재검사 | 성공(PASS) |
 
-#### Verification Summary
+#### 📋 검증 결과 요약 (Verification Summary)
 
-- Missing files are handled without an unhandled exception.
-- Invalid JSON files display an error message.
-- Missing patterns objects are detected safely.
-- Individual data errors are counted as FAIL.
-- Valid patterns continue to be analyzed after individual errors.
-- The failure report records pattern identifiers and reasons.
-- The intentional error test produced 4 PASS and 2 FAIL results.
-- One data error was included in the total FAIL count.
-- The intentional error test accuracy was 66.67%.
-- The local dataset accuracy remained 100.00%.
-- The official dataset accuracy remained 50.00%.
-- Original dataset files were not modified during error testing.
-- JSON loading supports UTF-8 files with or without BOM.
-
+- 데이터 파일이 존재하지 않아도 처리되지 않은 예외로 프로그램이 비정상 종료되지 않도록 구현했습니다.
+- 잘못된 JSON 파일을 불러오면 오류 메시지를 표시합니다.
+- patterns 객체가 누락된 경우에도 안전하게 오류를 감지합니다.
+- 개별 데이터에서 발생한 오류는 실패(FAIL)로 집계합니다.
+- 일부 데이터에서 오류가 발생하더라도 나머지 정상 데이터의 분석을 계속 진행합니다.
+- 실패 리포트에는 실패한 패턴의 이름과 실패 원인을 기록합니다.
+- 의도적으로 오류를 발생시킨 검사에서는 성공(PASS) 4개, 실패(FAIL) 2개의 결과가 나왔습니다.
+- 데이터 오류 1개는 전체 실패(FAIL) 횟수에 포함되었습니다.
+- 의도적으로 오류를 발생시킨 검사의 판정 정확도는 66.67%입니다.
+- 로컬 데이터의 판정 정확도는 100.00%로 유지되었습니다.
+- 공식 데이터의 판정 정확도는 50.00%로 유지되었습니다.
+- 오류 처리 기능을 검사하는 과정에서 원본 데이터 파일은 수정하지 않았습니다.
+- JSON 파일을 불러올 때 BOM(파일 시작 부분의 인코딩 표시)이 있거나 없는 UTF-8 형식을 모두 지원합니다.
