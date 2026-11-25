@@ -3,6 +3,10 @@
 
 ## AI가 계산하는 방식을 흉내 내는 작은 계산기 만들기
 
+![Pink Panda Mini NPU 동료평가 안내](screenshots/mini-npu-peer-evaluation-guide.png)
+
+---
+
 ### 📌 1. 프로젝트 소개
 
 이 프로젝트는 AI가 숫자 데이터를 이용하여 그림의 모양을 판별하는 원리를 이해하기 위해 제작한 Mini NPU 시뮬레이터입니다.
